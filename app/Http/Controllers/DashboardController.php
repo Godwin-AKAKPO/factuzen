@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
@@ -18,7 +22,7 @@ class DashboardController extends Controller
                                         -> whereIn('status', ['sent', 'overdue'])
                                         -> count(),
             'total_revenue'=> Invoice::where('user_id', $user->id)
-                                        -> where('status', paid)
+                                        -> where('status', 'paid')
                                         -> sum('total_ttc')    
         ];
         //Revenus mensuems (12 derniers mois)
