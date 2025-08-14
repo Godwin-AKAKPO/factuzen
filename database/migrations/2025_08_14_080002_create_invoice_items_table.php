@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('invoice_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
+            $table->string('description');
+            $table->integer('quantity');
+            $table->decimal('unit_price', 8, 2);
+            $table->decimal('tva_rate', 5, 2)->default(18.00);
+            $table->decimal('total_ht', 8, 2);
+            $table->decimal('total_tva', 8, 2);
+            $table->decimal('total_ttc', 8, 2);
             $table->timestamps();
         });
     }
