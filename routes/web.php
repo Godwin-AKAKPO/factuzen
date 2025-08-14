@@ -1,6 +1,10 @@
 <?php
 
+
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,33 +18,32 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+// Routes protégées par authentification
 Route::middleware('auth')->group(function () {
-    //Dashbord
+    
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    //Gestion du profil
+    
+    // Gestion du profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    //Gestion des clients
-    Route::ressource('clients', ClientController::class);
-
-    //Gestion des factures
-    Route::ressource('invoices', InvoiceController::class);
-
-    //Route spéciale pour les factures 
-    Route::post('/invoices/{invoices}/send', [InvoiceController::class, 'send'])->name('invoices.send');
-    Route::get('/invoices/{invoices}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
-    Route::patch('/invoices/{invoices}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
-
-    //Devis(quotes)
+    
+    // Gestion des clients
+    Route::resource('clients', ClientController::class);
+    
+    // Gestion des factures
+    Route::resource('invoices', InvoiceController::class);
+    
+    // Routes spéciales pour les factures
+    Route::post('/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
+    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+    Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
+    
+    // Devis (quotes)
     Route::get('/quotes', [InvoiceController::class, 'quotes'])->name('quotes.index');
     Route::get('/quotes/create', [InvoiceController::class, 'createQuote'])->name('quotes.create');
-    Route::post('quotes/{quotes}/convert', [InvoiceController::class, 'convertToInvoice'])->name('quotes.convert')
+    Route::post('/quotes/{quote}/convert', [InvoiceController::class, 'convertToInvoice'])->name('quotes.convert');
 });
 
 require __DIR__.'/auth.php';
