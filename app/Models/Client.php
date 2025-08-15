@@ -16,12 +16,12 @@ class Client extends Model
         'email',
         'phone',
         'address',
-    ]; // Correction : ajout du point-virgule manquant
+    ]; 
 
     // Relations
 
     // Relation : Un client appartient à un utilisateur
-    public function user(): BelongsTo // Correction : "fonction" => "function"
+    public function user(): BelongsTo 
     {
         return $this->belongsTo(User::class);
     }
