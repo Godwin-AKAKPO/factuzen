@@ -9,9 +9,12 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class ClientController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request): Response
     {
         $search = $request->get('search');

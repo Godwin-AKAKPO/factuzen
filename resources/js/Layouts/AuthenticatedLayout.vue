@@ -7,7 +7,7 @@
           <div class="flex">
             <!-- Logo -->
             <div class="shrink-0 flex items-center">
-              <Link :href="route('dashboard')" class="text-xl font-bold text-blue-600">
+              <Link :href="route('dashboard')" class="text-xl font-bold text-green-600">
                 FactuPro
               </Link>
             </div>
