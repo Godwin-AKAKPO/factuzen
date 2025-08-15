@@ -21,10 +21,7 @@
                 Clients
               </NavLink>
               <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
-                Factures
-              </NavLink>
-              <NavLink :href="route('quotes.index')" :active="route().current('quotes.*')">
-                Devis
+                Factures ou Devis 
               </NavLink>
             </div>
           </div>
