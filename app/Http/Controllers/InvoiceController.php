@@ -12,9 +12,19 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Services\PdfService;
 
 class InvoiceController extends Controller
 {
+    use AuthorizesRequests; // Permet d'utiliser les méthodes d'autorisation
+    protected $pdfService;
+
+    public function __construct(PdfService $pdfService)
+    {
+        $this->pdfService = $pdfService;
+    }
     public function index(Request $request): Response
     {
         $search = $request->get('search');
@@ -288,4 +298,88 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.show', $invoice->id)
                         ->with('message', 'Devis converti en facture avec succès.');
     }
+
+    
+
+
+    
+    /**
+     * Télécharger le PDF d'une facture
+     */
+    public function downloadPdf(Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+        
+        try {
+            return $this->pdfService->downloadPdf($invoice);
+        } catch (\Exception $e) {
+            return back()->withErrors(['pdf' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()]);
+        }
+    }
+    
+    /**
+     * Prévisualiser le PDF dans le navigateur
+     */
+    public function previewPdf(Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+        
+        try {
+            return $this->pdfService->streamPdf($invoice);
+        } catch (\Exception $e) {
+            return back()->withErrors(['pdf' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()]);
+        }
+    }
+    
+    /**
+     * Envoyer la facture par email avec PDF en pièce jointe
+     */
+        public function sendEmail(Invoice $invoice)
+        {
+            $this->authorize('update', $invoice);
+            
+            try {
+                // Générer le PDF
+                $pdf = $this->pdfService->generateInvoicePdf($invoice);
+                $filename = $this->pdfService->generateFilename($invoice);
+                
+                // Envoyer l'email avec le PDF en pièce jointe
+                Mail::to($invoice->client->email)->send(
+                    new \App\Mail\InvoiceMail($invoice, $pdf->output(), $filename)
+                );
+                
+                // Mettre à jour le statut si c'était un brouillon
+                if ($invoice->status === 'draft') {
+                    $invoice->update([
+                        'status' => 'sent',
+                        'sent_at' => now()
+                    ]);
+                }
+                
+                // Log de l'activité
+                \Log::info("Email envoyé", [
+                    'invoice_id' => $invoice->id,
+                    'client_email' => $invoice->client->email,
+                    'type' => $invoice->type
+                ]);
+                
+                return back()->with('message', 
+                    $invoice->type === 'quote' 
+                        ? 'Devis envoyé avec succès à ' . $invoice->client->email
+                        : 'Facture envoyée avec succès à ' . $invoice->client->email
+                );
+                
+            } catch (\Exception $e) {
+                \Log::error("Erreur envoi email", [
+                    'invoice_id' => $invoice->id,
+                    'error' => $e->getMessage()
+                ]);
+                
+                return back()->withErrors([
+                    'email' => 'Erreur lors de l\'envoi: ' . $e->getMessage()
+                ]);
+            }
+        }
 }
+
+

@@ -49,17 +49,33 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
-    public function generateReference(): string
-    {
-        $prefix = $this->type === 'quote' ? 'DEV' : 'FACT';
-        $year = date('Y');
-        $count = static::where('user_id', $this->user_id)
-                      ->where('type', $this->type)
-                      ->whereYear('created_at', $year)
-                      ->count() + 1;
-        
-        return sprintf('%s-%s-%03d', $prefix, $year, $count);
+public function generateReference()
+{
+    $year = now()->year;
+    $prefix = "FACT-$year";
+
+    // Récupérer le dernier numéro pour cette année
+    $lastInvoice = self::where('reference', 'like', "$prefix-%")
+        ->orderBy('id', 'desc')
+        ->first();
+
+    $nextNumber = 1;
+    if ($lastInvoice) {
+        $lastNumber = (int) str_replace("$prefix-", '', $lastInvoice->reference);
+        $nextNumber = $lastNumber + 1;
     }
+
+    // Générer une nouvelle référence
+    $reference = sprintf("%s-%03d", $prefix, $nextNumber);
+
+    // Tant qu’elle existe déjà, incrémenter
+    while (self::where('reference', $reference)->exists()) {
+        $nextNumber++;
+        $reference = sprintf("%s-%03d", $prefix, $nextNumber);
+    }
+
+    return $reference;
+}
 
     public function calculateTotals(): void
     {
