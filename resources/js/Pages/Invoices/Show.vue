@@ -161,16 +161,16 @@
                 <div class="grid grid-cols-2 gap-6">
                   
                   <!-- Informations émetteur (à remplacer par les données de l'entreprise) -->
-                  <!-- <div>
+                  <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-3">De :</h3>
                     <div class="text-sm text-gray-600 space-y-1">
-                      <p class="font-medium text-gray-900">Mon Entreprise</p>
-                      <p>123 Rue de l'exemple</p>
-                      <p>75001 Paris, France</p>
+                      <!-- <p class="font-medium text-gray-900">Mon Entreprise</p> -->
+                      <!-- <p>{{ invoice.users.name }}</p> -->
+                      <!-- <p>75001 Paris, France</p> -->
                       <p>contact@monentreprise.fr</p>
                       <p>+33 1 23 45 67 89</p>
                     </div>
-                  </div> -->
+                  </div>
                   
                   <!-- Informations client -->
                   <div>
@@ -443,10 +443,10 @@ function downloadPDF() {
   window.open(route('invoices.pdf.download', props.invoice.id), '_blank')
 }
 
-function previewPDF() {
-  // Prévisualiser le PDF dans un nouvel onglet
-  window.open(route('invoices.pdf.preview', props.invoice.id), '_blank')
-}
+// function previewPDF() {
+//   // Prévisualiser le PDF dans un nouvel onglet
+//   window.open(route('invoices.pdf.preview', props.invoice.id), '_blank')
+// }
 
 function sendEmail() {
   if (confirm('Envoyer cette facture par email au client ?')) {
