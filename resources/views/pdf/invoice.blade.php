@@ -31,7 +31,7 @@
             display: table;
             width: 100%;
             margin-bottom: 30px;
-            border-bottom: 2px solid #2563eb;
+            border-bottom: 2px solid #16a34a;
             padding-bottom: 20px;
         }
         
@@ -57,7 +57,7 @@
         .company-name {
             font-size: 24px;
             font-weight: bold;
-            color: #2563eb;
+            color: #16a34a;
             margin-bottom: 5px;
         }
         
@@ -71,7 +71,7 @@
         .document-title {
             font-size: 28px;
             font-weight: bold;
-            color: #2563eb;
+            color: #16a34a;
             text-align: right;
             margin-bottom: 5px;
         }
@@ -110,7 +110,7 @@
         .info-title {
             font-size: 14px;
             font-weight: bold;
-            color: #2563eb;
+            color: #16a34a;
             margin-bottom: 8px;
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 3px;
@@ -136,12 +136,12 @@
         }
         
         .items-table th {
-            background-color: #f8fafc;
-            border: 1px solid #e5e7eb;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
             padding: 10px 8px;
             text-align: left;
             font-weight: bold;
-            color: #374151;
+            color: #166534;
         }
         
         .items-table td {
@@ -181,7 +181,7 @@
         }
         
         .totals .final-total {
-            background-color: #2563eb;
+            background-color: #16a34a;
             color: white;
             font-weight: bold;
             font-size: 14px;
@@ -192,14 +192,14 @@
             clear: both;
             margin-top: 40px;
             padding: 15px;
-            background-color: #f8fafc;
-            border-left: 4px solid #2563eb;
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
         }
         
         .notes-title {
             font-weight: bold;
             margin-bottom: 8px;
-            color: #2563eb;
+            color: #16a34a;
         }
         
         .notes-content {
@@ -278,24 +278,22 @@
         <!-- Header avec logo et infos entreprise -->
         <div class="header">
             <div class="header-left">
-                @if(isset($company) && $company->logo)
-                    <img src="{{ public_path('storage/' . $company->logo) }}" alt="Logo" class="company-logo">
-                @endif
-                
                 <div class="company-name">
-                    {{ $company->name ?? 'Mon Entreprise' }}
+                    FactureZen
                 </div>
                 
                 <div class="company-info">
-                    {{ $company->address ?? '123 Rue de l\'exemple' }}<br>
-                    {{ $company->city ?? '75001 Paris' }}, {{ $company->country ?? 'France' }}<br>
-                    <strong>Email:</strong> {{ $company->email ?? 'contact@monentreprise.fr' }}<br>
-                    <strong>Tél:</strong> {{ $company->phone ?? '+33 1 23 45 67 89' }}<br>
-                    @if($company->siret ?? false)
-                        <strong>SIRET:</strong> {{ $company->siret }}<br>
+                    <!-- Informations de l'utilisateur qui a créé la facture -->
+                    <strong>{{ $invoice->user->name }}</strong><br>
+                    <strong>Email:</strong> {{ $invoice->user->email }}<br>
+                    @if($invoice->user->phone ?? false)
+                        <strong>Tél:</strong> {{ $invoice->user->phone }}<br>
                     @endif
-                    @if($company->tva_number ?? false)
-                        <strong>N° TVA:</strong> {{ $company->tva_number }}<br>
+                    @if($invoice->user->address ?? false)
+                        {{ $invoice->user->address }}<br>
+                    @endif
+                    @if($invoice->user->city ?? false)
+                        {{ $invoice->user->city }}<br>
                     @endif
                 </div>
             </div>
@@ -307,11 +305,11 @@
                 <div class="document-reference">
                     N° {{ $invoice->reference }}
                 </div>
-                <div style="margin-top: 10px;">
+                <!-- <div style="margin-top: 10px;">
                     <span class="status-badge status-{{ $invoice->status }}">
                         {{ $statusLabels[$invoice->status] ?? $invoice->status }}
                     </span>
-                </div>
+                </div> -->
             </div>
         </div>
         
@@ -427,27 +425,12 @@
         </div>
         @endif
         
-        <!-- Conditions de paiement -->
-        <div class="payment-terms">
-            <strong>Conditions de paiement:</strong><br>
-            @if($invoice->type === 'invoice')
-                Paiement à {{ \Carbon\Carbon::parse($invoice->due_date)->diffInDays(\Carbon\Carbon::parse($invoice->date)) }} jours. 
-                Tout retard de paiement entraînera l'application d'une pénalité de 3 fois le taux d'intérêt légal.
-                <br><br>
-                <strong>Modes de paiement acceptés:</strong> Virement bancaire, chèque, espèces (dans la limite légale).
-            @else
-                Ce devis est proposé sans engagement. Il devient contractuel dès acceptation écrite du client.
-                Les prix sont valables pour la durée mentionnée et peuvent être révisés en cas de modification des spécifications.
-            @endif
-        </div>
+
         
         <!-- Footer -->
         <div class="footer">
             {{ $invoice->type === 'quote' ? 'Devis' : 'Facture' }} généré{{ $invoice->type === 'quote' ? '' : 'e' }} le {{ \Carbon\Carbon::now()->format('d/m/Y à H:i') }} 
-            • {{ $company->name ?? 'Mon Entreprise' }}
-            @if($company->website ?? false)
-                • {{ $company->website }}
-            @endif
+            • FactureZen - Solution de facturation simplifiée
         </div>
         
     </div>
