@@ -30,7 +30,7 @@
         
         /* Header */
         .email-header {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
             color: white;
             padding: 30px 40px;
             text-align: center;
@@ -67,8 +67,8 @@
         
         /* Carte facture */
         .invoice-card {
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
             border-radius: 8px;
             padding: 25px;
             margin: 25px 0;
@@ -77,7 +77,7 @@
         .invoice-title {
             font-size: 20px;
             font-weight: bold;
-            color: #2563eb;
+            color: #16a34a;
             margin-bottom: 15px;
             text-align: center;
         }
@@ -94,21 +94,21 @@
         .invoice-details-cell {
             display: table-cell;
             padding: 8px 12px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #dcfce7;
         }
         
         .invoice-details-label {
             font-weight: 600;
-            color: #374151;
+            color: #166534;
             width: 40%;
         }
         
         .invoice-details-value {
-            color: #6b7280;
+            color: #15803d;
         }
         
         .total-amount {
-            background: #2563eb;
+            background: #16a34a;
             color: white;
             text-align: center;
             padding: 15px;
@@ -125,6 +125,27 @@
             font-size: 24px;
             font-weight: bold;
             margin-top: 5px;
+        }
+        
+        /* Informations expéditeur */
+        .sender-info {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .sender-info h3 {
+            color: #16a34a;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .sender-info p {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 3px 0;
         }
         
         /* Boutons d'action */
@@ -145,7 +166,7 @@
         }
         
         .btn-primary {
-            background: #2563eb;
+            background: #16a34a;
             color: white;
         }
         
@@ -209,7 +230,7 @@
         }
         
         .footer-links a {
-            color: #2563eb;
+            color: #16a34a;
             text-decoration: none;
             margin: 0 15px;
             font-size: 14px;
@@ -248,8 +269,8 @@
         
         <!-- Header -->
         <div class="email-header">
-            <div class="logo">{{ config('app.name', 'FactuPro') }}</div>
-            <div class="header-subtitle">Plateforme de facturation professionnelle</div>
+            <div class="logo">FactureZen</div>
+            <div class="header-subtitle">Solution de facturation simplifiée</div>
         </div>
         
         <!-- Corps de l'email -->
@@ -269,6 +290,16 @@
                     <p>Veuillez trouver ci-joint votre facture en format PDF.</p>
                     <p>Le paiement est attendu avant le <strong>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d/m/Y') }}</strong>. 
                     Merci de nous faire parvenir votre règlement dans les délais impartis.</p>
+                @endif
+            </div>
+            
+            <!-- Informations expéditeur -->
+            <div class="sender-info">
+                <h3>📧 Envoyé par :</h3>
+                <p><strong>{{ $invoice->user->name }}</strong></p>
+                <p>{{ $invoice->user->email }}</p>
+                @if($invoice->user->phone ?? false)
+                    <p>📞 {{ $invoice->user->phone }}</p>
                 @endif
             </div>
             
@@ -337,17 +368,17 @@
             <!-- Boutons d'action -->
             <div class="action-buttons">
                 @if($isQuote)
-                    <a href="mailto:{{ config('mail.reply_to.address', 'contact@factupro.com') }}?subject=Acceptation devis {{ $invoice->reference }}" class="btn btn-primary">
+                    <a href="mailto:{{ $invoice->user->email }}?subject=Acceptation devis {{ $invoice->reference }}" class="btn btn-primary">
                         ✅ Accepter le devis
                     </a>
-                    <a href="mailto:{{ config('mail.reply_to.address', 'contact@factupro.com') }}?subject=Question devis {{ $invoice->reference }}" class="btn btn-secondary">
+                    <a href="mailto:{{ $invoice->user->email }}?subject=Question devis {{ $invoice->reference }}" class="btn btn-secondary">
                         ❓ Poser une question
                     </a>
                 @else
-                    <a href="mailto:{{ config('mail.reply_to.address', 'contact@factupro.com') }}?subject=Confirmation paiement {{ $invoice->reference }}" class="btn btn-primary">
+                    <a href="mailto:{{ $invoice->user->email }}?subject=Confirmation paiement {{ $invoice->reference }}" class="btn btn-primary">
                         ✅ Confirmer le paiement
                     </a>
-                    <a href="mailto:{{ config('mail.reply_to.address', 'contact@factupro.com') }}?subject=Question facture {{ $invoice->reference }}" class="btn btn-secondary">
+                    <a href="mailto:{{ $invoice->user->email }}?subject=Question facture {{ $invoice->reference }}" class="btn btn-secondary">
                         ❓ Une question ?
                     </a>
                 @endif
@@ -356,7 +387,7 @@
             <!-- Message de clôture -->
             <div class="message-content">
                 <p>Nous restons à votre disposition pour tout complément d'information.</p>
-                <p>Cordialement,<br><strong>L'équipe {{ config('app.name', 'FactuPro') }}</strong></p>
+                <p>Cordialement,<br><strong>{{ $invoice->user->name }}</strong></p>
             </div>
             
         </div>
@@ -365,20 +396,22 @@
         <div class="email-footer">
             <div class="contact-info">
                 <h3>Informations de contact</h3>
-                <p><strong>Email:</strong> {{ config('mail.reply_to.address', 'contact@factupro.com') }}</p>
-                <p><strong>Téléphone:</strong> +229 XX XX XX XX</p>
-                <p><strong>Site web:</strong> www.factupro.com</p>
+                <p><strong>{{ $invoice->user->name }}</strong></p>
+                <p><strong>Email:</strong> {{ $invoice->user->email }}</p>
+                @if($invoice->user->phone ?? false)
+                    <p><strong>Téléphone:</strong> {{ $invoice->user->phone }}</p>
+                @endif
             </div>
             
             <div class="footer-links">
-                <a href="#">Conditions générales</a>
-                <a href="#">Politique de confidentialité</a>
-                <a href="#">Support</a>
+                <a href="#" style="color: #16a34a;">Conditions générales</a>
+                <a href="#" style="color: #16a34a;">Politique de confidentialité</a>
+                <a href="#" style="color: #16a34a;">Support</a>
             </div>
             
             <div class="footer-note">
-                <p>Cet email a été envoyé automatiquement depuis {{ config('app.name', 'FactuPro') }}.</p>
-                <p>Merci de ne pas répondre directement à cet email. Pour toute question, utilisez l'adresse: {{ config('mail.reply_to.address', 'contact@factupro.com') }}</p>
+                <p>Cet email a été envoyé automatiquement depuis FactureZen.</p>
+                <p>Pour toute question, répondez directement à cet email ou contactez {{ $invoice->user->email }}</p>
             </div>
         </div>
         
