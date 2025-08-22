@@ -349,7 +349,7 @@
             </div>
             
             <!-- Informations spécifiques -->
-            @if($isQuote)
+            <!-- @if($isQuote)
                 <div class="additional-info">
                     <h3>📋 Informations importantes</h3>
                     <p>• Ce devis est valable jusqu'au {{ \Carbon\Carbon::parse($invoice->due_date)->format('d/m/Y') }}</p>
@@ -363,7 +363,7 @@
                     <p>• En cas de retard, des pénalités de 3 fois le taux légal s'appliqueront</p>
                     <p>• Merci de mentionner la référence {{ $invoice->reference }} lors du paiement</p>
                 </div>
-            @endif
+            @endif -->
             
             <!-- Boutons d'action -->
             <div class="action-buttons">
