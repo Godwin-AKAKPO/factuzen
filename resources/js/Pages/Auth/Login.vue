@@ -63,7 +63,7 @@ function showMainLogo() {
                     @error="handleImageError"
                 >
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">FactureZen</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fac</h1>
                     <p class="text-sm text-gray-600 dark:text-gray-400">Facturation Simplifiée</p>
                 </div>
             </div>
