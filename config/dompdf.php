@@ -1,9 +1,4 @@
 <?php
-
-// ==========================================
-// 1. Configuration DomPDF - config/dompdf.php
-// ==========================================
-
 return [
     /**
      * Paramètres DomPDF

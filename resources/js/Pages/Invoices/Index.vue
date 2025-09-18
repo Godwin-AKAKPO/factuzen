@@ -235,7 +235,7 @@
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
                       <Link 
-                        :href="route('invoices.show', invoice.id)"
+                        :href="route('invoices.show', invoice.id, )"
                         class="text-blue-600 hover:text-blue-900 p-1 rounded"
                         title="Voir"
                       >

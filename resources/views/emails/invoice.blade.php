@@ -265,23 +265,16 @@
     </style>
 </head>
 <body>
-    <div class="email-container">
-        
-        <!-- Header -->
+    <div class="email-container">   
         <div class="email-header">
             <div class="logo">FactureZen</div>
             <div class="header-subtitle">Solution de facturation simplifiée</div>
         </div>
-        
-        <!-- Corps de l'email -->
         <div class="email-body">
-            
             <!-- Salutation -->
             <div class="greeting">
                 Bonjour {{ $client->name }},
             </div>
-            
-            <!-- Message principal -->
             <div class="message-content">
                 @if($isQuote)
                     <p>Nous avons le plaisir de vous transmettre notre devis pour les prestations demandées.</p>
@@ -292,8 +285,7 @@
                     Merci de nous faire parvenir votre règlement dans les délais impartis.</p>
                 @endif
             </div>
-            
-            <!-- Informations expéditeur -->
+
             <div class="sender-info">
                 <h3>📧 Envoyé par :</h3>
                 <p><strong>{{ $invoice->user->name }}</strong></p>
@@ -303,7 +295,7 @@
                 @endif
             </div>
             
-            <!-- Carte récapitulatif -->
+            
             <div class="invoice-card">
                 <div class="invoice-title">
                     {{ $isQuote ? 'DEVIS' : 'FACTURE' }} #{{ $invoice->reference }}
@@ -313,7 +305,7 @@
                     <div class="invoice-details-row">
                         <div class="invoice-details-cell invoice-details-label">Date d'émission:</div>
                         <div class="invoice-details-cell invoice-details-value">
-                            {{ \Carbon\Carbon::parse($invoice->date)->format('d/m/Y') }}
+                            {{ \Ca rbon\Carbon::parse($invoice->date)->format('d/m/Y') }}
                         </div>
                     </div>
                     

@@ -1,9 +1,4 @@
 <?php
-
-// ==========================================
-// 1. Mailable - app/Mail/InvoiceMail.php
-// ==========================================
-
 namespace App\Mail;
 
 use App\Models\Invoice;
