@@ -101,11 +101,11 @@
 
                             <div v-else class="space-y-3">
                                 <div v-for="invoice in overdueInvoices" :key="invoice.id"
-                                    class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    class="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg">
                                     <div>
                                         <div class="font-medium text-gray-900">{{ invoice.reference }}</div>
                                         <div class="text-sm text-gray-600">{{ invoice.client_name }}</div>
-                                        <div class="text-xs text-red-600">
+                                        <div class="text-xs text-blue-600">
                                             En retard de {{ invoice.days_overdue }} jour(s)
                                         </div>
                                     </div>

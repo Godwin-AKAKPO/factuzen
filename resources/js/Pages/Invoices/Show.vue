@@ -13,7 +13,6 @@
           <ArrowLeftIcon class="w-4 h-4 mr-1" />
           Retour aux {{ invoice.type === 'quote' ? 'devis' : 'factures' }}
           </Link>
-
           <div class="flex justify-between items-start">
             <div>
               <div class="flex items-center space-x-3 mb-2">
@@ -110,8 +109,7 @@
             </div>
             <div class="flex space-x-2">
               <button v-for="status in statusOptions" :key="status.value" @click="updateStatus(status.value)" :class="[
-                'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                invoice.status === status.value
+                  invoice.status === status.value
                   ? status.activeClass
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               ]">

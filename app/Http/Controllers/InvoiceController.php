@@ -18,7 +18,7 @@ use App\Services\PdfService;
 
 class InvoiceController extends Controller
 {
-    use AuthorizesRequests; // Permet d'utiliser les méthodes d'autorisation
+    use AuthorizesRequests;
     protected $pdfService;
 
     public function __construct(PdfService $pdfService)
@@ -29,7 +29,7 @@ class InvoiceController extends Controller
     {
         $search = $request->get('search');
         $status = $request->get('status');
-        $type = $request->get('type', 'invoice'); // Par défaut les factures
+        $type = $request->get('type', 'invoice');
         
         $invoices = Invoice::where('user_id', $request->user()->id)
                           ->where('type', $type)
@@ -50,7 +50,6 @@ class InvoiceController extends Controller
                           ->paginate(15)
                           ->withQueryString();
         
-        // Statistiques pour les filtres
         $stats = [
             'total' => Invoice::where('user_id', $request->user()->id)->where('type', $type)->count(),
             'draft' => Invoice::where('user_id', $request->user()->id)->where('type', $type)->where('status', 'draft')->count(),
@@ -89,20 +88,16 @@ class InvoiceController extends Controller
         $validated = $request->validated();
         $validated['user_id'] = $request->user()->id;
         
-        // Génération automatique de la référence
         $invoice = new Invoice($validated);
         $invoice->reference = $invoice->generateReference();
         $invoice->save();
         
-        // Création des articles de facture
         if (!empty($validated['items'])) {
             foreach ($validated['items'] as $itemData) {
                 $item = new InvoiceItem($itemData);
                 $item->invoice_id = $invoice->id;
                 $item->save();
             }
-            
-            // Recalcul des totaux de la facture
             $invoice->calculateTotals();
         }
         
@@ -125,7 +120,6 @@ class InvoiceController extends Controller
     {
         $this->authorize('update', $invoice);
         
-        // Empêcher la modification des factures payées
         if ($invoice->status === 'paid') {
             return redirect()->route('invoices.show', $invoice->id)
                            ->withErrors(['edit' => 'Impossible de modifier une facture payée.']);
@@ -147,7 +141,6 @@ class InvoiceController extends Controller
     {
         $this->authorize('update', $invoice);
         
-        // Empêcher la modification des factures payées
         if ($invoice->status === 'paid') {
             return redirect()->route('invoices.show', $invoice->id)
                            ->withErrors(['edit' => 'Impossible de modifier une facture payée.']);
@@ -155,21 +148,16 @@ class InvoiceController extends Controller
         
         $validated = $request->validated();
         
-        // Mise à jour de la facture
         $invoice->update($validated);
         
-        // Suppression des anciens articles
         $invoice->items()->delete();
         
-        // Création des nouveaux articles
         if (!empty($validated['items'])) {
             foreach ($validated['items'] as $itemData) {
                 $item = new InvoiceItem($itemData);
                 $item->invoice_id = $invoice->id;
                 $item->save();
             }
-            
-            // Recalcul des totaux
             $invoice->calculateTotals();
         }
         
@@ -181,7 +169,6 @@ class InvoiceController extends Controller
     {
         $this->authorize('delete', $invoice);
         
-        // Empêcher la suppression des factures payées ou envoyées
         if (in_array($invoice->status, ['paid', 'sent'])) {
             return back()->withErrors([
                 'delete' => 'Impossible de supprimer une facture payée ou envoyée.'
@@ -194,9 +181,6 @@ class InvoiceController extends Controller
                         ->with('message', 'Facture supprimée avec succès.');
     }
     
-    /**
-     * Mettre à jour le statut d'une facture
-     */
     public function updateStatus(Request $request, Invoice $invoice): RedirectResponse
     {
         $this->authorize('update', $invoice);
@@ -208,7 +192,6 @@ class InvoiceController extends Controller
         $newStatus = $request->status;
         $updateData = ['status' => $newStatus];
         
-        // Actions spécifiques selon le statut
         switch ($newStatus) {
             case 'sent':
                 if (!$invoice->sent_at) {
@@ -221,7 +204,6 @@ class InvoiceController extends Controller
                 }
                 break;
             case 'draft':
-                // Réinitialiser les timestamps si on repasse en brouillon
                 $updateData['sent_at'] = null;
                 $updateData['paid_at'] = null;
                 break;
@@ -232,14 +214,10 @@ class InvoiceController extends Controller
         return back()->with('message', 'Statut de la facture mis à jour.');
     }
     
-    /**
-     * Dupliquer une facture
-     */
     public function duplicate(Invoice $invoice): RedirectResponse
     {
         $this->authorize('view', $invoice);
         
-        // Créer une nouvelle facture basée sur l'ancienne
         $newInvoice = $invoice->replicate();
         $newInvoice->status = 'draft';
         $newInvoice->sent_at = null;
@@ -249,23 +227,18 @@ class InvoiceController extends Controller
         $newInvoice->reference = $newInvoice->generateReference();
         $newInvoice->save();
         
-        // Dupliquer les articles
         foreach ($invoice->items as $item) {
             $newItem = $item->replicate();
             $newItem->invoice_id = $newInvoice->id;
             $newItem->save();
         }
         
-        // Recalculer les totaux
         $newInvoice->calculateTotals();
         
         return redirect()->route('invoices.edit', $newInvoice->id)
                         ->with('message', 'Facture dupliquée avec succès.');
     }
     
-    /**
-     * Convertir un devis en facture
-     */
     public function convertToInvoice(Invoice $quote): RedirectResponse
     {
         $this->authorize('update', $quote);
@@ -274,7 +247,6 @@ class InvoiceController extends Controller
             return back()->withErrors(['convert' => 'Seuls les devis peuvent être convertis en factures.']);
         }
         
-        // Créer une nouvelle facture basée sur le devis
         $invoice = $quote->replicate();
         $invoice->type = 'invoice';
         $invoice->status = 'draft';
@@ -285,27 +257,18 @@ class InvoiceController extends Controller
         $invoice->reference = $invoice->generateReference();
         $invoice->save();
         
-        // Dupliquer les articles
         foreach ($quote->items as $item) {
             $newItem = $item->replicate();
             $newItem->invoice_id = $invoice->id;
             $newItem->save();
         }
         
-        // Recalculer les totaux
         $invoice->calculateTotals();
         
         return redirect()->route('invoices.show', $invoice->id)
                         ->with('message', 'Devis converti en facture avec succès.');
     }
 
-    
-
-
-    
-    /**
-     * Télécharger le PDF d'une facture
-     */
     public function downloadPdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
@@ -317,9 +280,6 @@ class InvoiceController extends Controller
         }
     }
     
-    /**
-     * Prévisualiser le PDF dans le navigateur
-     */
     public function previewPdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
@@ -331,55 +291,46 @@ class InvoiceController extends Controller
         }
     }
     
-    /**
-     * Envoyer la facture par email avec PDF en pièce jointe
-     */
-        public function sendEmail(Invoice $invoice)
-        {
-            $this->authorize('update', $invoice);
+    public function sendEmail(Invoice $invoice)
+    {
+        $this->authorize('update', $invoice);
+        
+        try {
+            $pdf = $this->pdfService->generateInvoicePdf($invoice);
+            $filename = $this->pdfService->generateFilename($invoice);
             
-            try {
-                // Générer le PDF
-                $pdf = $this->pdfService->generateInvoicePdf($invoice);
-                $filename = $this->pdfService->generateFilename($invoice);
-                
-                // Envoyer l'email avec le PDF en pièce jointe
-                Mail::to($invoice->client->email)->send(
-                    new \App\Mail\InvoiceMail($invoice, $pdf->output(), $filename)
-                );
-                
-                // Mettre à jour le statut si c'était un brouillon
-                if ($invoice->status === 'draft') {
-                    $invoice->update([
-                        'status' => 'sent',
-                        'sent_at' => now()
-                    ]);
-                }
-                
-                // Log de l'activité
-                \Log::info("Email envoyé", [
-                    'invoice_id' => $invoice->id,
-                    'client_email' => $invoice->client->email,
-                    'type' => $invoice->type
-                ]);
-                
-                return back()->with('message', 
-                    $invoice->type === 'quote' 
-                        ? 'Devis envoyé avec succès à ' . $invoice->client->email
-                        : 'Facture envoyée avec succès à ' . $invoice->client->email
-                );
-                
-            } catch (\Exception $e) {
-                \Log::error("Erreur envoi email", [
-                    'invoice_id' => $invoice->id,
-                    'error' => $e->getMessage()
-                ]);
-                
-                return back()->withErrors([
-                    'email' => 'Erreur lors de l\'envoi: ' . $e->getMessage()
+            Mail::to($invoice->client->email)->send(
+                new \App\Mail\InvoiceMail($invoice, $pdf->output(), $filename)
+            );
+            
+            if ($invoice->status === 'draft') {
+                $invoice->update([
+                    'status' => 'sent',
+                    'sent_at' => now()
                 ]);
             }
+            
+            \Log::info("Email envoyé", [
+                'invoice_id' => $invoice->id,
+                'client_email' => $invoice->client->email,
+                'type' => $invoice->type
+            ]);
+            
+            return back()->with('message', 
+                $invoice->type === 'quote' 
+                    ? 'Devis envoyé avec succès à ' . $invoice->client->email
+                    : 'Facture envoyée avec succès à ' . $invoice->client->email
+            );
+            
+        } catch (\Exception $e) {
+            \Log::error("Erreur envoi email", [
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return back()->withErrors([
+                'email' => 'Erreur lors de l\'envoi: ' . $e->getMessage()
+            ]);
         }
+    }
 }
-
-
