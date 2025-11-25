@@ -53,6 +53,7 @@
                     <option value="">Sélectionner un client</option>
                     <option 
                       v-for="client in clients" 
+                      
                       :key="client.id" 
                       :value="client.id"
                     >
@@ -116,7 +117,7 @@
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 flex items-center">
                   <ListBulletIcon class="w-6 h-6 mr-2 text-blue-600" />
-                  Articles
+                  Offre
                 </h2>
                 <button
                   type="button"
@@ -137,6 +138,7 @@
                       <th class="text-center py-2 text-sm font-medium text-gray-700 w-20">Qté</th>
                       <th class="text-right py-2 text-sm font-medium text-gray-700 w-24">Prix unit.</th>
                       <th class="text-center py-2 text-sm font-medium text-gray-700 w-20">TVA %</th>
+                      <th class="text-center py-2 text-sm font-medium text-gray-700 w-20">Promo %</th>
                       <th class="text-right py-2 text-sm font-medium text-gray-700 w-24">Total HT</th>
                       <th class="w-10"></th>
                     </tr>
@@ -152,7 +154,7 @@
                         <input
                           v-model="item.description"
                           type="text"
-                          placeholder="Description de l'article..."
+                          placeholder="Description de l'offre..."
                           class="w-full px-2 py-1 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm"
                           :class="{ 'border-red-500': errors[`items.${index}.description`] }"
                         />
@@ -208,7 +210,24 @@
                           {{ errors[`items.${index}.tva_rate`] }}
                         </p>
                       </td>
-                      
+
+                      <!-- Promo -->
+                        <td class="py-3 px-2 text-center">
+                        <input
+                          v-model.number="item.tva_promo"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="100"
+                          class="w-full px-2 py-1 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-center"
+                          :class="{ 'border-red-500': errors[`items.${index}.tva_promo`] }"
+                          @input="updateItemTotals(index)"
+                        />
+                        <p v-if="errors[`items.${index}.tva_promo`]" class="mt-1 text-xs text-red-600">
+                          {{ errors[`items.${index}.tva_promo`] }}
+                        </p>
+                      </td>
+
                       <!-- Total HT -->
                       <td class="py-3 px-2 text-right">
                         <span class="text-sm font-medium text-gray-900">
@@ -252,6 +271,10 @@
                       <span class="font-medium">{{ formatCurrency(totals.totalTva) }}</span>
                     </div>
                     <div class="flex justify-between text-lg font-bold border-t pt-2">
+                      <span>Total Promo:</span>
+                      <span>{{ formatCurrency(totals.totalPromo) }}</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold border-t pt-2">
                       <span>Total TTC:</span>
                       <span>{{ formatCurrency(totals.totalTtc) }}</span>
                     </div>
@@ -285,7 +308,8 @@
           <!-- Boutons -->
           <div class="flex justify-end space-x-3 bg-white p-6 rounded-lg shadow-sm">
             <Link 
-              :href="route('invoices.index', { type })"
+              
+              @click="goBack"
               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Annuler
@@ -340,7 +364,7 @@ const props = defineProps({
 const form = useForm({
   client_id: props.selectedClientId || '',
   type: props.type || 'invoice',
-  date: new Date().toISOString().split('T')[0],
+  date:    new Date().toLocaleDateString("fr"),
   due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +30 jours
   notes: '',
   items: []
@@ -354,18 +378,28 @@ const processing = computed(() => form.processing)
 const totals = computed(() => {
   const totalHt = form.items.reduce((sum, item) => sum + (item.total_ht || 0), 0)
   const totalTva = form.items.reduce((sum, item) => sum + (item.total_tva || 0), 0)
-  const totalTtc = totalHt + totalTva
+  const totalPromo=form.items.reduce((sum,item) => sum + (item.total_promo || 0), 0)
+  const totalTtc = totalHt + totalTva-totalPromo
   
-  return { totalHt, totalTva, totalTtc }
+  return { totalHt, totalTva, totalTtc , totalPromo}
 })
 
+
 // Méthodes
+
+//Fonction annuler , retourne à l'action précedente
+function goBack(){
+  window.history.back()
+}
+
 function addItem() {
   form.items.push({
     description: '',
     quantity: 1,
     unit_price: 0,
     tva_rate: 18.00,
+    tva_promo:0,
+    total_promo:0,
     total_ht: 0,
     total_tva: 0,
     total_ttc: 0
@@ -381,10 +415,12 @@ function updateItemTotals(index) {
   if (item.quantity && item.unit_price) {
     item.total_ht = item.quantity * item.unit_price
     item.total_tva = item.total_ht * (item.tva_rate / 100)
+    item.total_promo = item.total_ht * (item.tva_promo / 100)
     item.total_ttc = item.total_ht + item.total_tva
   } else {
     item.total_ht = 0
     item.total_tva = 0
+    item.total_promo=0
     item.total_ttc = 0
   }
 }
@@ -397,6 +433,7 @@ function formatCurrency(amount) {
 }
 
 // Soumission du formulaire
+
 function submit() {
   form.post(route('invoices.store'), {
     onSuccess: () => {

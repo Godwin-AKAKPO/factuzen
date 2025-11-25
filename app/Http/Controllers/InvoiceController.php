@@ -99,6 +99,7 @@ class InvoiceController extends Controller
             foreach ($validated['items'] as $itemData) {
                 $item = new InvoiceItem($itemData);
                 $item->invoice_id = $invoice->id;
+                
                 $item->save();
             }
             
@@ -107,7 +108,7 @@ class InvoiceController extends Controller
         }
         
         return redirect()->route('invoices.show', $invoice->id)
-                        ->with('message', 'Facture créée avec succès.');
+            ->with('message', 'Facture créée avec succès.');
     }
     
     public function show(Invoice $invoice): Response

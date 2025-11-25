@@ -340,10 +340,6 @@
                     <div class="info-content">
                         <table style="width: 100%; font-size: 11px;">
                             <tr>
-                                <td><strong>Date d'émission:</strong></td>
-                                <td>{{ \Carbon\Carbon::parse($invoice->date)->format('d/m/Y') }}</td>
-                            </tr>
-                            <tr>
                                 <td><strong>{{ $invoice->type === 'quote' ? 'Valable jusqu\'au:' : 'Échéance:' }}</strong></td>
                                 <td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d/m/Y') }}</td>
                             </tr>
@@ -381,8 +377,10 @@
                     <th style="width: 8%;" class="text-center">Qté</th>
                     <th style="width: 12%;" class="text-right">Prix unitaire</th>
                     <th style="width: 8%;" class="text-center">TVA</th>
+                    <th style="width: 8%;" class="text-center">Promo</th>
                     <th style="width: 12%;" class="text-right">Total HT</th>
-                    <th style="width: 10%;" class="text-right">TVA</th>
+                    <th style="width: 10%;" class="text-right">Total TVA</th>
+                    <th style="width: 10%;" class="text-right">Total Promo</th>
                 </tr>
             </thead>
             <tbody>
@@ -392,8 +390,10 @@
                     <td class="text-center">{{ $item->quantity }}</td>
                     <td class="text-right">{{ number_format($item->unit_price, 0, ',', ' ') }} FCFA</td>
                     <td class="text-center">{{ $item->tva_rate }}%</td>
+                    <td class="text-center">{{ $item->tva_promo }}%</td>
                     <td class="text-right">{{ number_format($item->total_ht, 0, ',', ' ') }} FCFA</td>
                     <td class="text-right">{{ number_format($item->total_tva, 0, ',', ' ') }} FCFA</td>
+                    <td class="text-right">{{ number_format($item->total_promo, 0, ',', ' ') }} FCFA</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -409,6 +409,10 @@
                 <tr>
                     <td><strong>Total TVA:</strong></td>
                     <td class="text-right">{{ number_format($invoice->total_tva, 0, ',', ' ') }} FCFA</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Promo:</strong></td>
+                    <td class="text-right">{{ number_format($invoice->total_promo, 0, ',', ' ') }} FCFA</td>
                 </tr>
                 <tr class="final-total">
                     <td><strong>TOTAL TTC:</strong></td>

@@ -31,6 +31,7 @@ class UpdateInvoiceRequest extends FormRequest
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
             'items.*.tva_rate' => 'required|numeric|min:0|max:100',
+            'items.*.tva_promo' => 'required|numeric|min:0|max:100',
         ];
     }
 
@@ -62,6 +63,10 @@ class UpdateInvoiceRequest extends FormRequest
             'items.*.tva_rate.numeric' => 'Le taux de TVA doit être un nombre.',
             'items.*.tva_rate.min' => 'Le taux de TVA ne peut pas être négatif.',
             'items.*.tva_rate.max' => 'Le taux de TVA ne peut pas dépasser 100%.',
+            'items.*.tva_promo.required' => 'Le taux de Promo est requis.',
+            'items.*.tva_promo.numeric' => 'Le taux de Promo doit être un nombre.',
+            'items.*.tva_promo.min' => 'Le taux de Promo ne peut pas être négatif.',
+            'items.*.tva_promo.max' => 'Le taux de Promo ne peut pas dépasser 100%.',
         ];
     }
 
@@ -80,6 +85,7 @@ class UpdateInvoiceRequest extends FormRequest
             'items.*.quantity' => 'quantité',
             'items.*.unit_price' => 'prix unitaire',
             'items.*.tva_rate' => 'taux de TVA',
+            'items.*.tva_promo' => 'taux de Promo',
         ];
     }
 

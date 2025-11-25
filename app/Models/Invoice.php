@@ -18,6 +18,7 @@ class Invoice extends Model
         'due_date',
         'total_ht',
         'total_tva',
+        'total_promo',
         'total_ttc',
         'notes',
         'sent_at',
@@ -31,6 +32,7 @@ class Invoice extends Model
         'paid_at' => 'datetime',
         'total_ht' => 'decimal:2',
         'total_tva' => 'decimal:2',
+        'total_promo' => 'decimal:2',
         'total_ttc' => 'decimal:2',
     ];
     
@@ -81,11 +83,13 @@ public function generateReference()
     {
         $totalHt = $this->items->sum('total_ht');
         $totalTva = $this->items->sum('total_tva');
+        $totalPromo = $this->items->sum('total_promo');
         $totalTtc = $this->items->sum('total_ttc');
 
         $this->update([
             'total_ht' => $totalHt,
             'total_tva' => $totalTva,
+            'total_promo' => $totalPromo,
             'total_ttc' => $totalTtc,
         ]);
     }

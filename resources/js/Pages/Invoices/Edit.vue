@@ -143,6 +143,8 @@
                                                 unit.</th>
                                             <th class="text-center py-2 text-sm font-medium text-gray-700 w-20">TVA %
                                             </th>
+                                            <th class="text-center py-2 text-sm font-medium text-gray-700 w-20">Promo %
+                                            </th>
                                             <th class="text-right py-2 text-sm font-medium text-gray-700 w-24">Total HT
                                             </th>
                                             <th class="w-10"></th>
@@ -200,11 +202,23 @@
                                                     {{ errors[`items.${index}.tva_rate`] }}
                                                 </p>
                                             </td>
+                                            <!-- Promo -->
+                                            <td class="py-3 px-2 text-center">
+                                                <input v-model.number="item.tva_promo" type="number" step="0.01" min="0"
+                                                    max="100"
+                                                    class="w-full px-2 py-1 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-center"
+                                                    :class="{ 'border-red-500': errors[`items.${index}.tva_promo`] }"
+                                                    @input="updateItemTotals(index)" />
+                                                <p v-if="errors[`items.${index}.tva_promo`]"
+                                                    class="mt-1 text-xs text-red-600">
+                                                    {{ errors[`items.${index}.tva_promo`] }}
+                                                </p>
+                                            </td>
 
                                             <!-- Total HT -->
                                             <td class="py-3 px-2 text-right">
                                                 <span class="text-sm font-medium text-gray-900">
-                                                    {{ formatCurrency(item.total_ht || 0) }}
+                                                {{ formatCurrency(item.total_ht || 0) }}
                                                 </span>
                                             </td>
 
@@ -239,6 +253,10 @@
                                         <div class="flex justify-between text-sm">
                                             <span class="text-gray-600">Total TVA:</span>
                                             <span class="font-medium">{{ formatCurrency(totals.totalTva) }}</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-600">Total Promo:</span>
+                                            <span class="font-medium">{{ formatCurrency(totals.totalPromo) }}</span>
                                         </div>
                                         <div class="flex justify-between text-lg font-bold border-t pt-2">
                                             <span>Total TTC:</span>
@@ -382,8 +400,10 @@ const form = useForm({
         quantity: item.quantity,
         unit_price: item.unit_price,
         tva_rate: item.tva_rate,
+        tva_promo: item.tva_promo,
         total_ht: item.total_ht,
         total_tva: item.total_tva,
+        total_promo: item.total_promo,
         total_ttc: item.total_ttc
     }))
 })
@@ -396,9 +416,10 @@ const processing = computed(() => form.processing)
 const totals = computed(() => {
     const totalHt = form.items.reduce((sum, item) => sum + (item.total_ht || 0), 0)
     const totalTva = form.items.reduce((sum, item) => sum + (item.total_tva || 0), 0)
-    const totalTtc = totalHt + totalTva
+    const totalPromo = form.items.reduce((sum, item) => sum + (item.total_promo || 0), 0)
+    const totalTtc = totalHt + totalTva - totalPromo
 
-    return { totalHt, totalTva, totalTtc }
+    return { totalHt, totalTva, totalTtc, totalPromo }
 })
 
 // Détection des changements significatifs
@@ -425,6 +446,7 @@ const itemsChanged = computed(() => {
             item.quantity !== original.quantity ||
             item.unit_price !== original.unit_price ||
             item.tva_rate !== original.tva_rate
+            
     })
 })
 
@@ -437,8 +459,10 @@ function addItem() {
         quantity: 1,
         unit_price: 0,
         tva_rate: 18.00,
+        tva_promo: 0,
         total_ht: 0,
         total_tva: 0,
+        total_promo: 0,
         total_ttc: 0
     })
 }
@@ -453,9 +477,11 @@ function updateItemTotals(index) {
         item.total_ht = item.quantity * item.unit_price
         item.total_tva = item.total_ht * (item.tva_rate / 100)
         item.total_ttc = item.total_ht + item.total_tva
+        item.total_promo = item.total_ht * (item.tva_promo / 100)
     } else {
         item.total_ht = 0
         item.total_tva = 0
+        item.total_promo = 0
         item.total_ttc = 0
     }
 }

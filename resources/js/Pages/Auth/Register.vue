@@ -11,6 +11,7 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    call:'',
 });
 
 const submit = () => {
@@ -18,6 +19,11 @@ const submit = () => {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
+
+function check(val){
+    const value=val.match(/[\d\+]/g).join("")||"";
+    return value
+}
 
 function handleImageError() {
     const mainLogo = document.getElementById('main-logo');
@@ -109,6 +115,24 @@ function showMainLogo() {
                             />
                             
                             <InputError class="mt-2" :message="form.errors.email" />
+                            
+                        </div>
+
+                        <div>
+                            <InputLabel for="call" value="Telephone" class="text-gray-700 dark:text-gray-300 font-medium" />
+
+                            <TextInput
+                                id="call"
+                                type="text"
+                                class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:ring-emerald-400 dark:focus:border-emerald-400 transition-all duration-200"
+                                v-model="form.call"
+                                required
+                                autocomplete=""
+                                placeholder="phone"
+                                @input="form.call = check(form.call)"
+                            />
+
+                            <InputError class="mt-2" :message="form.errors.call" />
                         </div>
 
                         <div>

@@ -44,6 +44,11 @@
                 Aperçu
               </button> -->
 
+              <!-- Bouton Annuler-->
+              <Button @click="goBack" class="x-4 p-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                Annuler
+              </Button>
+              
               <!-- Bouton Télécharger PDF -->
               <button @click="downloadPDF"
                 class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center">
@@ -181,7 +186,7 @@
 
               <!-- Articles -->
               <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Articles</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Offre</h3>
 
                 <div class="overflow-x-auto">
                   <table class="min-w-full">
@@ -198,6 +203,9 @@
                         </th>
                         <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           TVA %
+                        </th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Promo%
                         </th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Total HT
@@ -218,6 +226,9 @@
                         <td class="px-4 py-4 text-sm text-gray-900 text-center">
                           {{ item.tva_rate }}%
                         </td>
+                        <td class="px-4 py-4 text-sm text-gray-900 text-center">
+                          {{ item.tva_promo }}%
+                        </td>
                         <td class="px-4 py-4 text-sm text-gray-900 text-right font-medium">
                           {{ formatCurrency(item.total_ht) }}
                         </td>
@@ -237,6 +248,10 @@
                       <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Total TVA :</span>
                         <span class="font-medium">{{ formatCurrency(invoice.total_tva) }}</span>
+                      </div>
+                      <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Total Promo :</span>
+                        <span class="font-medium">{{ formatCurrency(invoice.total_promo) }}</span>
                       </div>
                       <div class="flex justify-between text-lg font-bold border-t pt-2">
                         <span>Total TTC :</span>
@@ -400,6 +415,13 @@ const statusOptions = computed(() => [
 // Méthodes
 function updateStatus(status) {
   router.patch(route('invoices.update-status', props.invoice.id), { status })
+}
+
+//Fonction Annuler
+function goBack(){
+  router.delete(route('invoices.destroy', props.invoice.id))
+  window.history.back()
+  
 }
 
 function downloadPDF() {

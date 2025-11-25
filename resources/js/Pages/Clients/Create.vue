@@ -110,7 +110,7 @@
             <!-- Boutons -->
             <div class="flex justify-end space-x-3 pt-4 border-t">
               <Link 
-                :href="route('clients.index')"
+                @click="goBack"
                 class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Annuler
@@ -151,6 +151,12 @@ const form = useForm({
 // Erreurs de validation
 const errors = computed(() => form.errors)
 const processing = computed(() => form.processing)
+
+//Methode
+//Fonction Annuler
+function goBack(){
+  window.history.back()
+}
 
 // Soumission du formulaire
 function submit() {

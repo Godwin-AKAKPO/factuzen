@@ -305,7 +305,7 @@
                     <div class="invoice-details-row">
                         <div class="invoice-details-cell invoice-details-label">Date d'émission:</div>
                         <div class="invoice-details-cell invoice-details-value">
-                            {{ \Ca rbon\Carbon::parse($invoice->date)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($invoice->date)->format('d/m/Y') }}
                         </div>
                     </div>
                     
