@@ -269,17 +269,25 @@ class InvoiceController extends Controller
                         ->with('message', 'Devis converti en facture avec succès.');
     }
 
-    public function downloadPdf(Invoice $invoice)
+ public function downloadPdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
         
         try {
             return $this->pdfService->downloadPdf($invoice);
         } catch (\Exception $e) {
+            \Log::error('Erreur génération PDF', [
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage()
+            ]);
+            
             return back()->withErrors(['pdf' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()]);
         }
     }
     
+    /**
+     * Prévisualiser le PDF (nouvel onglet)
+     */
     public function previewPdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
@@ -287,13 +295,18 @@ class InvoiceController extends Controller
         try {
             return $this->pdfService->streamPdf($invoice);
         } catch (\Exception $e) {
+            \Log::error('Erreur aperçu PDF', [
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage()
+            ]);
+            
             return back()->withErrors(['pdf' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()]);
         }
     }
     
     public function sendEmail(Invoice $invoice)
     {
-        $this->authorize('update', $invoice);
+        $this->authorize('update', arguments: $invoice);
         
         try {
             $pdf = $this->pdfService->generateInvoicePdf($invoice);

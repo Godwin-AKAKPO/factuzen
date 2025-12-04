@@ -13,7 +13,7 @@ class PdfService
     public function generateInvoicePdf(Invoice $invoice): \Barryvdh\DomPDF\PDF
     {
         // Charger les relations nécessaires
-        $invoice->load(['client', 'items']);
+        $invoice->load(['client', 'items', 'user']);
         
         // Données pour le template
         $data = [
@@ -37,27 +37,34 @@ class PdfService
     }
     
     /**
-     * Télécharger le PDF
+     * Télécharger le PDF (retourne le contenu binaire avec headers)
      */
     public function downloadPdf(Invoice $invoice): \Symfony\Component\HttpFoundation\Response
     {
         $pdf = $this->generateInvoicePdf($invoice);
-        
         $filename = $this->generateFilename($invoice);
         
-        return $pdf->download($filename);
+        // Retourner le PDF avec les bons headers pour forcer le téléchargement
+        return response($pdf->output())
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
     
     /**
-     * Streamer le PDF (affichage navigateur)
+     * Streamer le PDF (affichage navigateur dans nouvel onglet)
      */
     public function streamPdf(Invoice $invoice): \Symfony\Component\HttpFoundation\Response
     {
         $pdf = $this->generateInvoicePdf($invoice);
-        
         $filename = $this->generateFilename($invoice);
         
-        return $pdf->stream($filename);
+        return response($pdf->output())
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
     
     /**

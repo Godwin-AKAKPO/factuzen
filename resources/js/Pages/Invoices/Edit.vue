@@ -69,7 +69,7 @@
                                     </label>
                                     <select id="client_id" v-model="form.client_id"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{ 'border-red-500': errors.client_id }" required>
+                                        :class="{ 'border-red-500': errors.client_id }" >
                                         <!-- AJOUTEZ CES LIGNES QUI MANQUENT : -->
                                         <option value="">Sélectionner un client</option>
                                         <option v-for="client in clients" :key="client.id" :value="client.id">
@@ -96,7 +96,7 @@
                                     </label>
                                     <input id="date" v-model="form.date" type="date"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{ 'border-red-500': errors.date }" required />
+                                        :class="{ 'border-red-500': errors.date }" />
                                     <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
                                 </div>
 
@@ -107,7 +107,7 @@
                                     </label>
                                     <input id="due_date" v-model="form.due_date" type="date"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{ 'border-red-500': errors.due_date }" required />
+                                        :class="{ 'border-red-500': errors.due_date }"  />
                                     <p v-if="errors.due_date" class="mt-1 text-sm text-red-600">{{ errors.due_date }}
                                     </p>
                                 </div>

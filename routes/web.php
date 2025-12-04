@@ -46,11 +46,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/quotes/create', [InvoiceController::class, 'createQuote'])->name('quotes.create');     // Création d'un devis
     Route::post('/quotes/{quote}/convert', [InvoiceController::class, 'convertToInvoice'])->name('quotes.convert'); // Conversion d'un devis en facture
 
-    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])
+ Route::get('invoices/{invoice}/pdf/download', [InvoiceController::class, 'downloadPdf'])
         ->name('invoices.pdf.download');
     
-    // Route::get('/invoices/{invoice}/pdf/preview', [InvoiceController::class, 'previewPdf'])
-    //     ->name('invoices.pdf.preview');
+    Route::get('invoices/{invoice}/pdf/preview', [InvoiceController::class, 'previewPdf'])
+        ->name('invoices.pdf.preview');
     
     Route::post('/invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])
         ->name('invoices.send-email');
