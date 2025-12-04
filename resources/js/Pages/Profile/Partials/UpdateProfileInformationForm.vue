@@ -14,11 +14,17 @@ defineProps({
     },
 });
 
+
+function check(value){
+    val=value.match(/[\d\+]/g).join("")||"";
+    return val;
+}
 const user = usePage().props.auth.user;
 
 const form = useForm({
     name: user.name,
     email: user.email,
+    call:user.call
 });
 </script>
 
@@ -39,7 +45,7 @@ const form = useForm({
             class="mt-6 space-y-6"
         >
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value=form.name v-model="form.name" />
 
                 <TextInput
                     id="name"
@@ -55,6 +61,21 @@ const form = useForm({
             </div>
 
             <div>
+               <InputLabel for="call" value="Phone" />
+               <TextInput
+                id="call"
+                type="text"
+                class="mt-1 block w-full"
+                v-model="form.call"
+                autofocus
+                autocomplete="call"
+                @input="form.call=check(form.call)"
+               />
+
+               <InputError class="mt-2" :message="form.errors.call" />
+            </div>
+
+            <div>
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -64,6 +85,7 @@ const form = useForm({
                     v-model="form.email"
                     required
                     autocomplete="username"
+
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />

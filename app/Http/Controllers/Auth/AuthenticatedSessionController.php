@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,51 +17,67 @@ use Inertia\Response;
  */
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     * Affiche la page de connexion avec Inertia
-     */
+    // Affiche la page de connexion
     public function create(): Response
     {
         // Rendu de la vue de connexion avec les données nécessaires
         return Inertia::render('Auth/Login', [
-            // Vérifie si la route de réinitialisation de mot de passe existe
-            'canResetPassword' => Route::has('password.request'),
-            // Récupère le message de statut de la session (ex: après reset password)
+            'canResetPassword' => route('password.request') ? true : false,
             'status' => session('status'),
         ]);
     }
 
-    /**
-     * Handle an incoming authentication request.
-     * Traite la requête de connexion de l'utilisateur
-     */
-    public function store(LoginRequest $request): RedirectResponse
+    // Gère la connexion
+    public function store(LoginRequest $request)
     {
-        // Authentifie l'utilisateur avec les credentials fournis
-        // Lance une exception si l'authentification échoue
-        $request->authenticate();
+        try {
+            $request->authenticate();
+            $request->session()->regenerate();
 
-        // Régénère l'ID de session pour prévenir la fixation de session
-        $request->session()->regenerate();
+            // Si c'est une requête AJAX (Axios)
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('dashboard')
+                ]);
+            }
 
-        // Redirige vers la page initialement demandée ou vers le dashboard par défaut
-        return redirect()->intended(route('dashboard', absolute: false));
+            // Sinon redirection classique
+            return redirect()->intended(route('dashboard'));
+
+        } catch (ValidationException $e) {
+
+            // Pour Axios : gérer throttling et erreurs validation
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+
+                // Trop de tentatives
+                if ($e->status === 429) {
+                    $retryAfter = RateLimiter::availableIn($request->throttleKey());
+                    return response()->json([
+                        'errors' => $e->errors(),
+                        'retry_after' => $retryAfter,
+                        'message' => 'Trop de tentatives. Veuillez réessayer dans ' . $retryAfter . ' secondes.'
+                    ], 429);
+                }
+
+                // Autres erreurs de validation
+                return response()->json([
+                    'errors' => $e->errors(),
+                    'message' => 'Données invalides'
+                ], 422);
+            }
+
+            // Pour Inertia classique
+            throw $e;
+        }
     }
 
-    /**
-     * Destroy an authenticated session.
-     * Déconnecte l'utilisateur et détruit sa session
-     */
-    public function destroy(Request $request): RedirectResponse
+    // Déconnexion
+    public function destroy(Request $request)
     {
         // Déconnecte l'utilisateur du guard 'web'
         Auth::guard('web')->logout();
-
-        // Invalide la session actuelle
         $request->session()->invalidate();
-
-        // Régénère le token CSRF pour la sécurité
         $request->session()->regenerateToken();
 
         // Redirige vers la page d'accueil

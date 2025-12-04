@@ -104,8 +104,9 @@ class ClientController extends Controller
     // Supprime un client
     public function destroy(Client $client): RedirectResponse
     {
+        
         $this->authorize('delete', $client); // Vérifie si l'utilisateur peut supprimer ce client
-
+        
         // Vérifie s'il y a des factures associées au client
         if ($client->invoices()->count() > 0) {
             // Retourne une erreur si le client a des factures
@@ -113,7 +114,7 @@ class ClientController extends Controller
                 'delete' => 'Impossible de supprimer ce client car il a des factures associées.'
             ]);
         }
-
+        
         $client->delete(); // Supprime le client
 
         // Redirige vers la liste avec un message de succès

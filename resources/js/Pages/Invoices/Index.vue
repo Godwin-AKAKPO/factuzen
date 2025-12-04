@@ -82,7 +82,7 @@
               <option value="sent">Envoyées</option>
               <option value="paid">Payées</option>
               <option value="overdue">En retard</option>
-              <option value="cancelled">Annulées</option>
+             
             </select>
             
             <!-- Statistiques -->

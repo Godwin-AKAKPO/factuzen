@@ -14,8 +14,10 @@ class InvoiceItem extends Model
         'quantity',      // Quantité de l'article
         'unit_price',    // Prix unitaire
         'tva_rate',      // Taux de TVA appliqué
+        'tva_promo', 
         'total_ht',      // Total hors taxes
         'total_tva',     // Montant de la TVA
+        'total_promo', 
         'total_ttc',     // Total toutes taxes comprises
     ];
 
@@ -24,8 +26,10 @@ class InvoiceItem extends Model
         'quantity' => 'integer',         // Quantité en entier
         'unit_price' => 'decimal:2',     // Prix unitaire en décimal (2 chiffres après la virgule)
         'tva_rate' => 'decimal:2',       // Taux de TVA en décimal
+        'tva_promo' => 'decimal:2', 
         'total_ht' => 'decimal:2',       // Total HT en décimal
         'total_tva' => 'decimal:2',      // Total TVA en décimal
+        'total_promo' => 'decimal:2', 
         'total_ttc' => 'decimal:2',      // Total TTC en décimal
     ];
 
@@ -43,8 +47,10 @@ class InvoiceItem extends Model
         $this->total_ht = $this->quantity * $this->unit_price;
         // Calcul du montant de la TVA
         $this->total_tva = $this->total_ht * ($this->tva_rate / 100);
+        // Calcul du montant de la Promo
+        $this->total_promo = $this->total_ht * ($this->tva_promo / 100);
         // Calcul du total TTC
-        $this->total_ttc = $this->total_ht + $this->total_tva;
+        $this->total_ttc = $this->total_ht + $this->total_tva - $this->total_promo;
     }
 
     // Méthode boot pour exécuter automatiquement le calcul avant sauvegarde

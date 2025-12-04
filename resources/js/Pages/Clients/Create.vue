@@ -176,6 +176,13 @@ watch(() => props.show, (newShow) => {
 const errors = computed(() => form.errors)
 const processing = computed(() => form.processing)
 
+//Methode
+//Fonction Annuler
+function goBack(){
+  window.history.back()
+}
+
+// Soumission du formulaire
 function submit() {
   form.post(route('clients.store'), {
     onSuccess: () => {

@@ -226,10 +226,10 @@ const emit = defineEmits(['close', 'created'])
 const form = useForm({
   client_id: props.selectedClientId || '',
   type: props.type || 'invoice',
-  date: new Date().toISOString().split('T')[0],
-  due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  date:    new Date().toLocaleDateString("fr"),
+  due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +30 jours
   notes: '',
-  items: []
+  items:[]
 })
 
 watch(() => props.show, (newShow) => {
@@ -247,9 +247,19 @@ const processing = computed(() => form.processing)
 const totals = computed(() => {
   const totalHt = form.items.reduce((sum, item) => sum + (item.total_ht || 0), 0)
   const totalTva = form.items.reduce((sum, item) => sum + (item.total_tva || 0), 0)
-  const totalTtc = totalHt + totalTva
-  return { totalHt, totalTva, totalTtc }
+  const totalPromo=form.items.reduce((sum,item) => sum + (item.total_promo || 0), 0)
+  const totalTtc = totalHt + totalTva-totalPromo
+  
+  return { totalHt, totalTva, totalTtc , totalPromo}
 })
+
+
+// Méthodes
+
+//Fonction annuler , retourne à l'action précedente
+function goBack(){
+  window.history.back()
+}
 
 function addItem() {
   form.items.push({
@@ -257,6 +267,8 @@ function addItem() {
     quantity: 1,
     unit_price: 0,
     tva_rate: 18.00,
+    tva_promo:0,
+    total_promo:0,
     total_ht: 0,
     total_tva: 0,
     total_ttc: 0
@@ -272,10 +284,12 @@ function updateItemTotals(index) {
   if (item.quantity && item.unit_price) {
     item.total_ht = item.quantity * item.unit_price
     item.total_tva = item.total_ht * (item.tva_rate / 100)
+    item.total_promo = item.total_ht * (item.tva_promo / 100)
     item.total_ttc = item.total_ht + item.total_tva
   } else {
     item.total_ht = 0
     item.total_tva = 0
+    item.total_promo=0
     item.total_ttc = 0
   }
 }
@@ -286,6 +300,8 @@ function formatCurrency(amount) {
     currency: 'XOF'
   }).format(amount)
 }
+
+// Soumission du formulaire
 
 function submit() {
   form.post(route('invoices.store'), {

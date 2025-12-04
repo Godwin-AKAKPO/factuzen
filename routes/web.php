@@ -17,7 +17,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,    // Version de Laravel
         'phpVersion' => PHP_VERSION,                 // Version de PHP
     ]);
-})->name('welcome');
+})->name('welcome')->middleware('guest');
 
 // Groupe de routes protégées par le middleware d'authentification
 Route::middleware('auth')->group(function () {
