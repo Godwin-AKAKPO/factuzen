@@ -67,34 +67,22 @@
                                     <label for="client_id" class="block text-sm font-medium text-gray-700 mb-2">
                                         Client *
                                     </label>
-                                    <select id="client_id" v-model="form.client_id"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{ 'border-red-500': errors.client_id }" required>
-                                        <!-- AJOUTEZ CES LIGNES QUI MANQUENT : -->
-                                        <option value="">Sélectionner un client</option>
-                                        <option v-for="client in clients" :key="client.id" :value="client.id">
-                                            {{ client.name }}{{ client.company ? ` (${client.company})` : '' }}
-                                        </option>
-                                    </select>
-                                    <p v-if="errors.client_id" class="mt-1 text-sm text-red-600">{{ errors.client_id }}
-                                    </p>
 
-                                    <!-- Optionnel : lien pour créer un nouveau client -->
-                                    <div class="mt-1 text-sm text-gray-500 flex items-center">
-                                        <span>Pas de client ?</span>
-                                        <Link :href="route('clients.create')"
-                                            class="ml-1 text-blue-600 hover:text-blue-800 font-medium">
-                                        Créer un nouveau client
-                                        </Link>
-                                    </div>
+                                    <input type="text" 
+                                        :value="selectedClientName" 
+                                        readonly 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700" />
+
+                                    <p v-if="errors.client_id" class="mt-1 text-sm text-red-600">{{ errors.client_id }}</p>
                                 </div>
+
 
                                 <!-- Date d'échéance -->
                                 <div>
                                     <label for="date" class="block text-sm font-medium text-gray-700 mb-2">
                                         Date d'émission *
                                     </label>
-                                    <input id="date" v-model="form.date" type="date"
+                                    <input id="date" :value="form.new_date" type="date" readonly
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                         :class="{ 'border-red-500': errors.date }" required />
                                     <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
@@ -265,7 +253,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <p v-if="errors.items" class="mt-2 text-sm text-red-600">{{ errors.items }}</p>
                         </div>
                     </div>
@@ -379,6 +366,7 @@ import {
 const props = defineProps({
     invoice: Object,
     clients: Array,
+    Clients: Array
 })
 
 // Données originales pour comparaison
@@ -387,25 +375,31 @@ const originalData = ref({
     total_ttc: props.invoice.total_ttc,
     items: [...props.invoice.items]
 })
-
-// Formulaire réactif avec Inertia
 const form = useForm({
+    new_date:new Date(props.invoice.date).toISOString().slice(0, 10),
     client_id: props.invoice.client_id,
     date: props.invoice.date,
     due_date: props.invoice.due_date,
     notes: props.invoice.notes || '',
     items: props.invoice.items.map(item => ({
-        id: item.id,
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        tva_rate: item.tva_rate,
-        tva_promo: item.tva_promo,
-        total_ht: item.total_ht,
-        total_tva: item.total_tva,
-        total_promo: item.total_promo,
-        total_ttc: item.total_ttc
-    }))
+    id: item.id,
+    description: item.description ?? "",
+    quantity: Number(item.quantity) || 0,
+    unit_price: Number(item.unit_price) || 0,
+    tva_rate: Number(item.tva_rate) || 0,
+    tva_promo: Number(item.tva_promo) || 0,
+    total_ht: Number(item.total_ht) || 0,
+    total_tva: Number(item.total_tva) || 0,
+    total_promo: Number(item.total_promo) || 0,
+    total_ttc: Number(item.total_ttc) || 0
+}))
+
+
+})
+//Trouver de façon dnamique le nom du client de la facture
+const selectedClientName = computed(() => {
+    const client = props.Clients.find(c => c.id === form.client_id)
+    return client ? client.name : ''
 })
 
 // Erreurs de validation
@@ -474,10 +468,11 @@ function removeItem(index) {
 function updateItemTotals(index) {
     const item = form.items[index]
     if (item.quantity && item.unit_price) {
-        item.total_ht = item.quantity * item.unit_price
-        item.total_tva = item.total_ht * (item.tva_rate / 100)
-        item.total_ttc = item.total_ht + item.total_tva
-        item.total_promo = item.total_ht * (item.tva_promo / 100)
+        item.total_ht = Number(item.quantity) * Number(item.unit_price)
+        item.total_tva = item.total_ht * (Number(item.tva_rate) / 100)
+        item.total_promo = item.total_ht * (Number(item.tva_promo) / 100)
+        item.total_ttc = item.total_ht + item.total_tva - item.total_promo
+
     } else {
         item.total_ht = 0
         item.total_tva = 0

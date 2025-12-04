@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('call')->unique();
+        Schema::table('clients', function (Blueprint $table) {
+            $table->foreign('user_id')
+            ->references('id')->on('users')
+            ->onDelete('restrict');
         });
     }
 
@@ -21,8 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('call');
+        Schema::table('clients', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
         });
     }
 };
+           

@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Services\PdfService;
-
+ use Illuminate\Support\Facades\Auth;
 class InvoiceController extends Controller
 {
     use AuthorizesRequests; // Permet d'utiliser les méthodes d'autorisation
@@ -117,30 +117,38 @@ class InvoiceController extends Controller
         
         $invoice->load(['client', 'items', 'user']);
         
-        return Inertia::render('Invoices/Show', [
+        return Inertia::render( 'Invoices/Show', [
             'invoice' => $invoice,
         ]);
     }
     
-    public function edit(Invoice $invoice): Response
+    public function edit(Invoice $invoice)
     {
         $this->authorize('update', $invoice);
         
         // Empêcher la modification des factures payées
         if ($invoice->status === 'paid') {
-            return redirect()->route('invoices.show', $invoice->id)
-                           ->withErrors(['edit' => 'Impossible de modifier une facture payée.']);
+            return redirect()->route('invoices.show',$invoice->id)->with('errors',[
+                'edit' => 'Impossible de modifier une facture payée.'
+            ]);
+           
         }
-        
-        $clients = Client::where('user_id', auth()->id())
+       
+
+        $userId = Auth::id();
+        $clients = Client::where('user_id', "=",$userId)
                         ->orderBy('name')
                         ->get(['id', 'name', 'company']);
+
+        $Clients=Client::all();                
         
         $invoice->load(['client', 'items']);
+        
         
         return Inertia::render('Invoices/Edit', [
             'invoice' => $invoice,
             'clients' => $clients,
+            'Clients' => $Clients,
         ]);
     }
     

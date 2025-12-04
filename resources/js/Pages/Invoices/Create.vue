@@ -367,7 +367,7 @@ const form = useForm({
   date:    new Date().toLocaleDateString("fr"),
   due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +30 jours
   notes: '',
-  items: []
+  items:[]
 })
 
 // Erreurs de validation
