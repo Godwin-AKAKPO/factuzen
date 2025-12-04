@@ -361,14 +361,14 @@
             <div class="action-buttons">
                 @if($isQuote)
                     <a href="mailto:{{ $invoice->user->email }}?subject=Acceptation devis {{ $invoice->reference }}" class="btn btn-primary">
-                        ✅ Accepter le devis
+                        Accepter le devis
                     </a>
                     <a href="mailto:{{ $invoice->user->email }}?subject=Question devis {{ $invoice->reference }}" class="btn btn-secondary">
                         ❓ Poser une question
                     </a>
                 @else
                     <a href="mailto:{{ $invoice->user->email }}?subject=Confirmation paiement {{ $invoice->reference }}" class="btn btn-primary">
-                        ✅ Confirmer le paiement
+                        Confirmer le paiement
                     </a>
                     <a href="mailto:{{ $invoice->user->email }}?subject=Question facture {{ $invoice->reference }}" class="btn btn-secondary">
                         ❓ Une question ?

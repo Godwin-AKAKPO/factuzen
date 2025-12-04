@@ -13,16 +13,20 @@
                         <p class="text-gray-600">Vue d'ensemble de votre activité</p>
                     </div>
                     <div class="flex space-x-3">
-                        <Link :href="route('invoices.create')"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                        <PlusIcon class="w-5 h-5 inline mr-2" />
-                        Nouvelle facture
-                        </Link>
-                        <Link :href="route('clients.create')"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                        <UserPlusIcon class="w-5 h-5 inline mr-2" />
-                        Nouveau client
-                        </Link>
+                        <button 
+                            @click="showInvoiceCreateModal = true"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                        >
+                            <PlusIcon class="w-5 h-5 inline mr-2" />
+                            Nouvelle facture
+                        </button>
+                        <button 
+                            @click="showClientCreateModal = true"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                        >
+                            <UserPlusIcon class="w-5 h-5 inline mr-2" />
+                            Nouveau client
+                        </button>
                     </div>
                 </div>
 
@@ -69,7 +73,9 @@
 
                             <div v-else class="space-y-3">
                                 <div v-for="invoice in recentInvoices" :key="invoice.id"
-                                    class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                                    @click="viewInvoice(invoice)"
+                                >
                                     <div>
                                         <div class="font-medium text-gray-900">{{ invoice.reference }}</div>
                                         <div class="text-sm text-gray-600">{{ invoice.client_name }}</div>
@@ -101,11 +107,13 @@
 
                             <div v-else class="space-y-3">
                                 <div v-for="invoice in overdueInvoices" :key="invoice.id"
-                                    class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    class="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 cursor-pointer transition-colors"
+                                    @click="viewInvoice(invoice)"
+                                >
                                     <div>
                                         <div class="font-medium text-gray-900">{{ invoice.reference }}</div>
                                         <div class="text-sm text-gray-600">{{ invoice.client_name }}</div>
-                                        <div class="text-xs text-red-600">
+                                        <div class="text-xs text-blue-600">
                                             En retard de {{ invoice.days_overdue }} jour(s)
                                         </div>
                                     </div>
@@ -114,6 +122,7 @@
                                             {{ formatCurrency(invoice.total_ttc) }}
                                         </div>
                                         <button
+                                            @click.stop="handleReminder(invoice)"
                                             class="text-xs bg-red-600 text-white px-2 py-1 rounded mt-1 hover:bg-red-700">
                                             Relancer
                                         </button>
@@ -126,14 +135,34 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal de création de client -->
+        <ClientCreate 
+            :show="showClientCreateModal"
+            @close="showClientCreateModal = false"
+            @created="handleClientCreated"
+        />
+        
+        <!-- Modal de création de facture -->
+        <InvoiceCreate 
+            :show="showInvoiceCreateModal"
+            :clients="clients"
+            type="invoice"
+            @close="showInvoiceCreateModal = false"
+            @created="handleInvoiceCreated"
+        />
+        
     </AuthenticatedLayout>
 </template>
 
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { ref } from 'vue'
+import { Head, Link, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import StatsCard from '@/Components/StatsCard.vue'
 import StatusBadge from '@/Components/StatusBadge.vue'
+import ClientCreate from '@/Pages/Clients/Create.vue'
+import InvoiceCreate from '@/Pages/Invoices/Create.vue'
 import {
     PlusIcon,
     UserPlusIcon,
@@ -168,7 +197,12 @@ const props = defineProps({
     monthlyRevenue: Array,
     recentInvoices: Array,
     overdueInvoices: Array,
+    clients: Array,
 })
+
+// État local pour les modals
+const showClientCreateModal = ref(false)
+const showInvoiceCreateModal = ref(false)
 
 // Configuration du graphique
 const chartData = {
@@ -226,6 +260,27 @@ const chartOptions = {
         axis: 'x',
         intersect: false
     }
+}
+
+// Fonction pour voir une facture
+function viewInvoice(invoice) {
+    router.visit(route('invoices.show', invoice.id))
+}
+
+// Fonction pour gérer les relances
+function handleReminder(invoice) {
+    // Vous pouvez implémenter la logique de relance ici
+    console.log('Relancer la facture:', invoice.reference)
+    // Exemple: router.post(route('invoices.remind', invoice.id))
+}
+
+// Gestionnaires d'événements pour les modals
+function handleClientCreated() {
+    router.reload({ only: ['stats'] })
+}
+
+function handleInvoiceCreated() {
+    router.reload({ only: ['stats', 'recentInvoices'] })
 }
 
 // Fonction utilitaire pour formater la devise

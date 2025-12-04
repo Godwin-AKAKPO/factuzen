@@ -13,7 +13,6 @@
           <ArrowLeftIcon class="w-4 h-4 mr-1" />
           Retour aux {{ invoice.type === 'quote' ? 'devis' : 'factures' }}
           </Link>
-
           <div class="flex justify-between items-start">
             <div>
               <div class="flex items-center space-x-3 mb-2">
@@ -115,8 +114,7 @@
             </div>
             <div class="flex space-x-2">
               <button v-for="status in statusOptions" :key="status.value" @click="updateStatus(status.value)" :class="[
-                'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                invoice.status === status.value
+                  invoice.status === status.value
                   ? status.activeClass
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               ]">
@@ -341,12 +339,6 @@
                   </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                  <Link :href="route('clients.show', invoice.client.id)"
-                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                  Voir toutes les factures de ce client →
-                  </Link>
-                </div>
               </div>
             </div>
 
@@ -359,13 +351,13 @@
                   <Link :href="route('invoices.create', { client: invoice.client.id, type: invoice.type })"
                     class="w-full text-left bg-blue-50 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium flex items-center">
                   <DocumentPlusIcon class="w-4 h-4 mr-2" />
-                  Nouveau {{ invoice.type === 'quote' ? 'devis' : 'facture' }} pour ce client
+                  Nouvelle {{ invoice.type === 'quote' ? 'devis' : 'facture' }} pour ce client
                   </Link>
 
                   <button @click="duplicate"
                     class="w-full text-left bg-gray-50 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium flex items-center">
                     <DocumentDuplicateIcon class="w-4 h-4 mr-2" />
-                    Dupliquer ce {{ invoice.type === 'quote' ? 'devis' : 'facture' }}
+                    Dupliquer cette {{ invoice.type === 'quote' ? 'devis' : 'facture' }}
                   </button>
                 </div>
               </div>
@@ -416,16 +408,27 @@ function updateStatus(status) {
   router.patch(route('invoices.update-status', props.invoice.id), { status })
 }
 
-//Fonction Annuler
-function goBack(){
-  router.delete(route('invoices.destroy', props.invoice.id))
-  window.history.back()
-  
-}
+// function downloadPDF() {
+//   // Télécharger le PDF
+//   window.open(route('invoices.pdf.download', props.invoice.id), '_blank')
+// }
+// Dans votre Show.vue, remplacez la fonction downloadPDF par celle-ci :
 
 function downloadPDF() {
-  // Télécharger le PDF
-  window.open(route('invoices.pdf.download', props.invoice.id), '_blank')
+  
+  const link = document.createElement('a');
+  link.href = route('invoices.pdf.download', props.invoice.id);
+  link.download = `${props.invoice.type === 'quote' ? 'Devis' : 'Facture'}_${props.invoice.reference}.pdf`;
+  
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+
+function previewPDF() {
+  window.open(route('invoices.pdf.preview', props.invoice.id), '_blank');
 }
 
 // function previewPDF() {

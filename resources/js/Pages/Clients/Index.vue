@@ -12,13 +12,13 @@
             <p class="text-gray-600">Gérez vos clients</p>
           </div>
           
-          <Link 
-            :href="route('clients.create')"
+          <button 
+            @click="showCreateModal = true"
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center"
           >
             <UserPlusIcon class="w-5 h-5 mr-2" />
             Nouveau client
-          </Link>
+          </button>
         </div>
         
         <!-- Barre de recherche -->
@@ -43,13 +43,13 @@
             <p class="text-gray-600 mb-4">
               {{ search ? 'Aucun client ne correspond à votre recherche.' : 'Commencez par ajouter votre premier client.' }}
             </p>
-            <Link 
-              :href="route('clients.create')"
+            <button 
+              @click="showCreateModal = true"
               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <UserPlusIcon class="w-5 h-5 mr-2" />
               Ajouter un client
-            </Link>
+            </button>
           </div>
           
           <div v-else class="overflow-x-auto">
@@ -101,20 +101,20 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
-                      <Link 
-                        :href="route('clients.show', client.id)"
+                      <button 
+                        @click="showClient(client)"
                         class="text-blue-600 hover:text-blue-900 p-1 rounded"
                         title="Voir"
                       >
                         <EyeIcon class="w-5 h-5" />
-                      </Link>
-                      <Link 
-                        :href="route('clients.edit', client.id)"
+                      </button>
+                      <button 
+                        @click="editClient(client)"
                         class="text-green-600 hover:text-green-900 p-1 rounded"
                         title="Modifier"
                       >
                         <PencilIcon class="w-5 h-5" />
-                      </Link>
+                      </button>
                       <button 
                         @click="confirmDelete(client)"
                         class="text-red-600 hover:text-red-900 p-1 rounded"
@@ -138,6 +138,30 @@
       </div>
     </div>
     
+    <!-- Modal de création -->
+    <Create 
+      :show="showCreateModal"
+      @close="showCreateModal = false"
+      @created="handleClientCreated"
+    />
+    
+    <!-- Modal d'affichage -->
+    <Show 
+      :show="showShowModal"
+      :client="selectedClient"
+      @close="showShowModal = false"
+      @edit="editClient"
+      @delete="confirmDelete"
+    />
+    
+    <!-- Modal d'édition -->
+    <Edit 
+      :show="showEditModal"
+      :client="selectedClient"
+      @close="showEditModal = false"
+      @updated="handleClientUpdated"
+    />
+    
     <!-- Modal de confirmation de suppression -->
     <ConfirmModal 
       :show="showDeleteModal" 
@@ -154,10 +178,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import ConfirmModal from '@/Components/ConfirmModal.vue'
+import Create from '@/Pages/Clients/Create.vue'
+import Show from '@/Pages/Clients/Show.vue'
+import Edit from '@/Pages/Clients/Edit.vue'
 import { 
   UserPlusIcon, 
   UsersIcon,
@@ -175,7 +202,11 @@ const props = defineProps({
 
 // État local
 const searchQuery = ref(props.search || '')
+const showCreateModal = ref(false)
+const showShowModal = ref(false)
+const showEditModal = ref(false)
 const showDeleteModal = ref(false)
+const selectedClient = ref(null)
 const clientToDelete = ref(null)
 
 // Recherche avec debounce
@@ -189,9 +220,24 @@ const handleSearch = debounce(() => {
   )
 }, 300)
 
+// Afficher un client
+function showClient(client) {
+  selectedClient.value = client
+  showShowModal.value = true
+}
+
+// Modifier un client
+function editClient(client) {
+  selectedClient.value = client
+  showShowModal.value = false // Fermer le modal show si ouvert
+  showEditModal.value = true
+}
+
 // Confirmation de suppression
 function confirmDelete(client) {
   clientToDelete.value = client
+  showShowModal.value = false // Fermer le modal show si ouvert
+  showEditModal.value = false // Fermer le modal edit si ouvert
   showDeleteModal.value = true
 }
 
@@ -204,6 +250,15 @@ function deleteClient() {
       }
     })
   }
+}
+
+// Gestionnaires d'événements pour les modals
+function handleClientCreated() {
+  router.reload({ only: ['clients'] })
+}
+
+function handleClientUpdated() {
+  router.reload({ only: ['clients'] })
 }
 
 // Utilitaires

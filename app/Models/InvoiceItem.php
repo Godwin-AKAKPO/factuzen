@@ -40,7 +40,7 @@ class InvoiceItem extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    // Méthode pour calculer les totaux (HT, TVA, TTC)
+  //  Méthode pour calculer les totaux (HT, TVA, TTC)
     public function calculateTotals(): void
     {
         // Calcul du total hors taxes

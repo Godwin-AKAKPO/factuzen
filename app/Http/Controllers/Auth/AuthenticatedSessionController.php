@@ -11,11 +11,16 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Contrôleur de gestion des sessions d'authentification
+ * Gère la connexion, la déconnexion et l'affichage du formulaire de login
+ */
 class AuthenticatedSessionController extends Controller
 {
     // Affiche la page de connexion
     public function create(): Response
     {
+        // Rendu de la vue de connexion avec les données nécessaires
         return Inertia::render('Auth/Login', [
             'canResetPassword' => route('password.request') ? true : false,
             'status' => session('status'),
@@ -70,10 +75,12 @@ class AuthenticatedSessionController extends Controller
     // Déconnexion
     public function destroy(Request $request)
     {
+        // Déconnecte l'utilisateur du guard 'web'
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Redirige vers la page d'accueil
         return redirect('/');
     }
 }

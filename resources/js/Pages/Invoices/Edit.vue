@@ -67,6 +67,17 @@
                                     <label for="client_id" class="block text-sm font-medium text-gray-700 mb-2">
                                         Client *
                                     </label>
+                                    <select id="client_id" v-model="form.client_id"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                        :class="{ 'border-red-500': errors.client_id }" >
+                                        <!-- AJOUTEZ CES LIGNES QUI MANQUENT : -->
+                                        <option value="">Sélectionner un client</option>
+                                        <option v-for="client in clients" :key="client.id" :value="client.id">
+                                            {{ client.name }}{{ client.company ? ` (${client.company})` : '' }}
+                                        </option>
+                                    </select>
+                                    <p v-if="errors.client_id" class="mt-1 text-sm text-red-600">{{ errors.client_id }}
+                                    </p>
 
                                     <input type="text" 
                                         :value="selectedClientName" 
@@ -84,7 +95,7 @@
                                     </label>
                                     <input id="date" :value="form.new_date" type="date" readonly
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{ 'border-red-500': errors.date }" required />
+                                        :class="{ 'border-red-500': errors.date }" />
                                     <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
                                 </div>
 
@@ -95,7 +106,7 @@
                                     </label>
                                     <input id="due_date" v-model="form.due_date" type="date"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{ 'border-red-500': errors.due_date }" required />
+                                        :class="{ 'border-red-500': errors.due_date }"  />
                                     <p v-if="errors.due_date" class="mt-1 text-sm text-red-600">{{ errors.due_date }}
                                     </p>
                                 </div>

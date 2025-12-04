@@ -17,13 +17,13 @@
               </p>
             </div>
             
-            <Link 
-              :href="route('invoices.create', { type })"
+            <button 
+              @click="showCreateModal = true"
               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center"
             >
               <DocumentPlusIcon class="w-5 h-5 mr-2" />
               {{ type === 'quote' ? 'Nouveau devis' : 'Nouvelle facture' }}
-            </Link>
+            </button>
           </div>
           
           <!-- Onglets Type -->
@@ -165,13 +165,13 @@
                 : (type === 'quote' ? 'Commencez par créer votre premier devis.' : 'Commencez par créer votre première facture.')
               }}
             </p>
-            <Link 
-              :href="route('invoices.create', { type })"
+            <button 
+              @click="showCreateModal = true"
               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <DocumentPlusIcon class="w-5 h-5 mr-2" />
               {{ type === 'quote' ? 'Créer un devis' : 'Créer une facture' }}
-            </Link>
+            </button>
           </div>
           
           <div v-else class="overflow-x-auto">
@@ -234,21 +234,21 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-2">
-                      <Link 
-                        :href="route('invoices.show', invoice.id, )"
+                      <button 
+                        @click="showInvoice(invoice)"
                         class="text-blue-600 hover:text-blue-900 p-1 rounded"
                         title="Voir"
                       >
                         <EyeIcon class="w-5 h-5" />
-                      </Link>
-                      <Link 
+                      </button>
+                      <button 
                         v-if="invoice.status !== 'paid'"
-                        :href="route('invoices.edit', invoice.id)"
+                        @click="editInvoice(invoice)"
                         class="text-green-600 hover:text-green-900 p-1 rounded"
                         title="Modifier"
                       >
                         <PencilIcon class="w-5 h-5" />
-                      </Link>
+                      </button>
                       <button 
                         @click="showActionMenu(invoice)"
                         class="text-gray-600 hover:text-gray-900 p-1 rounded"
@@ -272,6 +272,15 @@
       </div>
     </div>
     
+    <!-- Modal de création -->
+    <InvoiceCreate 
+      :show="showCreateModal"
+      :clients="allClients"
+      :type="type"
+      @close="showCreateModal = false"
+      @created="handleInvoiceCreated"
+    />
+    
     <!-- Modal de menu d'actions -->
     <ActionModal 
       :show="actionModalOpen" 
@@ -290,6 +299,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import ActionModal from '@/Components/ActionModal.vue'
+import InvoiceCreate from '@/Pages/Invoices/Create.vue'
 import { 
   DocumentPlusIcon,
   DocumentTextIcon,
@@ -306,6 +316,7 @@ const props = defineProps({
   status: String,
   type: String,
   stats: Object,
+  allClients: Array,
 })
 
 // État local
@@ -313,6 +324,7 @@ const searchQuery = ref(props.search || '')
 const statusFilter = ref(props.status || '')
 const actionModalOpen = ref(false)
 const selectedInvoice = ref(null)
+const showCreateModal = ref(false)
 
 // Recherche avec debounce
 const handleSearch = debounce(() => {
@@ -328,7 +340,6 @@ const handleSearch = debounce(() => {
     }
   )
 }, 300)
-
 // Filtre par statut
 function handleStatusFilter() {
   router.get(route('invoices.index'), 
@@ -350,6 +361,14 @@ function setStatusFilter(status) {
 }
 
 // Actions
+function showInvoice(invoice) {
+  router.visit(route('invoices.show', invoice.id))
+}
+
+function editInvoice(invoice) {
+  router.visit(route('invoices.edit', invoice.id))
+}
+
 function showActionMenu(invoice) {
   selectedInvoice.value = invoice
   actionModalOpen.value = true
@@ -370,6 +389,10 @@ function handleAction(action, invoice) {
       break
   }
   actionModalOpen.value = false
+}
+
+function handleInvoiceCreated() {
+  router.reload({ only: ['invoices', 'stats'] })
 }
 
 // Utilitaires

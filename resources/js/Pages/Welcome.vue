@@ -57,7 +57,7 @@ function showMainLogo() {
                             @error="handleImageError"
                         >
                         <div>
-                            <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">Test</h1>
+                            <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">FactureZen</h1>
                             <p class="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Facturation Simplifiée</p>
                         </div>
                     </div>
@@ -124,18 +124,12 @@ function showMainLogo() {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                 </svg>
                             </Link>
-                            <!-- <button class="inline-flex items-center justify-center rounded-lg border-2 border-emerald-300 bg-white px-8 py-3 text-base font-semibold text-emerald-700 transition-all hover:bg-emerald-50 hover:border-emerald-400 hover:shadow-lg dark:border-emerald-600 dark:bg-gray-800 dark:text-emerald-300 dark:hover:border-emerald-500 dark:hover:bg-emerald-900/20">
-                                <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10V9a2 2 0 012-2h2a2 2 0 012 2v1M9 10v5a2 2 0 002 2h2a2 2 0 002-2v-5" />
-                                </svg>
-                                Voir la démo
-                            </button> -->
                         </div>
 
                         <!-- Stats améliorées -->
                         <div class="mt-12 grid grid-cols-3 gap-8">
                             <div class="text-center group">
-                                <div class="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent group-hover:from-emerald-600 group-hover:to-green-600 transition-all duration-300">1000+</div>
+                                <div class="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent group-hover:from-emerald-600 group-hover:to-green-600 transition-all duration-300">1000+</div>
                                 <div class="text-sm text-gray-600 dark:text-gray-400 font-medium">Clients satisfaits</div>
                             </div>
                             <div class="text-center group">
@@ -151,51 +145,10 @@ function showMainLogo() {
 
                     <!-- Image/Visual améliorée -->
                     <div class="relative flex items-center justify-center">
-                        <div class="relative">
-                            <!-- Decorative elements avec animation -->
-                            <div class="absolute -top-6 -left-6 h-80 w-80 rounded-full bg-gradient-to-r from-green-200 to-emerald-200 opacity-30 blur-2xl animate-pulse dark:from-green-800 dark:to-emerald-800"></div>
-                            <div class="absolute -bottom-6 -right-6 h-80 w-80 rounded-full bg-gradient-to-r from-emerald-200 to-green-200 opacity-30 blur-2xl animate-pulse animation-delay-1000 dark:from-emerald-800 dark:to-green-800"></div>
-                            
-                            <!-- Main visual améliorée -->
-                            <div id="hero-image" class="relative z-10 rounded-3xl bg-white p-10 shadow-2xl border border-gray-100 dark:bg-gray-800 dark:border-gray-700 transform hover:scale-105 transition-transform duration-300">
-                                <div class="space-y-6">
-                                    <!-- Mock invoice header -->
-                                    <div class="flex items-center justify-between">
-                                        <div class="h-10 w-32 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 shadow-sm"></div>
-                                        <div class="text-right space-y-2">
-                                            <div class="h-4 w-24 rounded bg-gray-300 dark:bg-gray-600"></div>
-                                            <div class="h-3 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Mock invoice content -->
-                                    <div class="border-t pt-6 dark:border-gray-700">
-                                        <div class="space-y-3">
-                                            <div class="flex justify-between items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                                <div class="h-3 w-40 rounded bg-gray-300 dark:bg-gray-600"></div>
-                                                <div class="h-3 w-20 rounded bg-green-500"></div>
-                                            </div>
-                                            <div class="flex justify-between items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                                <div class="h-3 w-36 rounded bg-gray-300 dark:bg-gray-600"></div>
-                                                <div class="h-3 w-18 rounded bg-green-500"></div>
-                                            </div>
-                                            <div class="flex justify-between items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                                <div class="h-3 w-44 rounded bg-gray-300 dark:bg-gray-600"></div>
-                                                <div class="h-3 w-22 rounded bg-green-500"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Total section -->
-                                        <div class="mt-6 border-t pt-4 dark:border-gray-700 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-4">
-                                            <div class="flex justify-between items-center">
-                                                <div class="h-5 w-24 rounded bg-gradient-to-r from-emerald-600 to-green-600"></div>
-                                                <div class="h-5 w-28 rounded bg-gradient-to-r from-emerald-600 to-green-600"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <img 
+                            src="/images/undraw_printing-invoices_osgs (2).svg" 
+                            alt="Illustration envoi d'argent" 
+                        >
                     </div>
                 </div>
             </div>
@@ -227,12 +180,7 @@ function showMainLogo() {
                             <p class="mt-4 text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
                                 Créez des factures professionnelles en moins de 30 secondes avec nos modèles intelligents et personnalisables.
                             </p>
-                            <!-- <div class="mt-6 flex items-center text-green-600 dark:text-green-400 font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                <span class="text-sm">En savoir plus</span>
-                                <svg class="ml-2 h-4 w-4 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </div> -->
+
                         </div>
 
                         <!-- Feature 2 -->
@@ -248,12 +196,6 @@ function showMainLogo() {
                             <p class="mt-4 text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
                                 Automatisez vos relances, suivez vos paiements en temps réel et analysez vos performances avec des tableaux de bord avancés.
                             </p>
-                            <!-- <div class="mt-6 flex items-center text-emerald-600 dark:text-emerald-400 font-semibold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                                <span class="text-sm">En savoir plus</span>
-                                <svg class="ml-2 h-4 w-4 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </div> -->
                         </div>
 
                         <!-- Feature 3 -->
@@ -269,12 +211,7 @@ function showMainLogo() {
                             <p class="mt-4 text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
                                 Protection maximale avec chiffrement SSL, authentification à deux facteurs et sauvegardes automatiques quotidiennes.
                             </p>
-                            <!-- <div class="mt-6 flex items-center text-green-600 dark:text-green-400 font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                <span class="text-sm">En savoir plus</span>
-                                <svg class="ml-2 h-4 w-4 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </div> -->
+
                         </div>
                     </div>
                 </div>
@@ -328,7 +265,7 @@ function showMainLogo() {
                         FactureZen v{{ laravelVersion }} - Propulsé par Laravel (PHP v{{ phpVersion }})
                     </p> -->
                     <p class="text-xs text-gray-500 dark:text-gray-500">
-                        © 2024 FactureZen. Tous droits réservés. 
+                        © 2025 FactureZen. Tous droits réservés. 
                     </p>
                 </div>
             </div>
